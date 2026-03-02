@@ -94,7 +94,7 @@ class AIModel:
             model_identifier,
             quantization_config=quantization_config,
             device_map='auto' if self.device == 'cuda' else None,
-            torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32,
+            dtype=torch.float16 if self.device == 'cuda' else torch.float32,
             trust_remote_code=True
         )
 
@@ -125,7 +125,7 @@ class AIModel:
             logger.info(f"Загружаем из файла: {self.model_path}")
             self.pipe = StableDiffusionXLPipeline.from_single_file(
                 self.model_path,  # используем нормализованный путь
-                torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32,
+                dtype=torch.float16 if self.device == 'cuda' else torch.float32,
                 use_safetensors=True,
                 **self.kwargs.get('pipeline_kwargs', {})
             )
@@ -140,7 +140,7 @@ class AIModel:
 
             self.pipe = DiffusionPipeline.from_pretrained(
                 model_identifier,
-                torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32,
+                dtype=torch.float16 if self.device == 'cuda' else torch.float32,
                 **self.kwargs.get('pipeline_kwargs', {})
             )
 
@@ -203,29 +203,32 @@ class AIModel:
         return f"<AIModel type={self.model_type} name={self.raw_model_name} device={self.device}>"
     
 if __name__ == "__main__":
-    # 1. Текстовая модель (Qwen 2.5 7B) с 4-битной загрузкой
-    # text_model = AIModel(
-    #     "F:/AI/Models/Qwen2.5-7B-Instruct",
-    #     model_type="text",
-    #     load_in_4bit=True,  # экономия памяти
-    # )
-    # response = text_model.generate("Привет! Как тебя зовут?", max_new_tokens=100)
-    # print("Ответ модели:", response)
-
+    #1. Текстовая модель (Qwen 2.5 7B) с 4-битной загрузкой
+    text_model = AIModel(
+        "F:/AI/Models/Qwen2.5-7B-Instruct",
+        model_type="text",
+        load_in_4bit=True,  # экономия памяти
+    )
+    response = text_model.generate("Какой билд собирать на нахиду из геншин импакт?", max_new_tokens=100)
+    print("Ответ модели:", response)
+    response = text_model.generate("Какой билд собирать на райден из геншин импакт?", max_new_tokens=100)
+    print("Ответ модели:", response)
+    response = text_model.generate("Какой билд собирать на варку из геншин импакт?", max_new_tokens=100)
+    print("Ответ модели:", response)
     # 2. Модель для генерации изображений (ваша Nova Anime XL)
-    image_model = AIModel(
-        "./Models/NovaAnimeXL_ilV160/novaAnimeXL_ilV160.safetensors",  # локальный файл
-        model_type="image",
-    )
-    img = image_model.generate(
-        "masterpiece, best quality, girl",
-        negative_prompt="worst quality, bad anatomy, watermark",
-        width=512,
-        height=512,
-        num_inference_steps=20
-    )
-    img.save("my_bear.png")
-    print("Изображение сохранено")
+    # image_model = AIModel(
+    #     "./Models/NovaAnimeXL_ilV160/novaAnimeXL_ilV160.safetensors",  # локальный файл
+    #     model_type="image",
+    # )
+    # img = image_model.generate(
+    #     "masterpiece, best quality, girl",
+    #     negative_prompt="worst quality, bad anatomy, watermark",
+    #     width=512,
+    #     height=512,
+    #     num_inference_steps=20
+    # )
+    # img.save("my_bear.png")
+    # print("Изображение сохранено")
 
     # 3. Пример с LoRA-адаптером (если у вас есть обученный адаптер)
     # text_model_with_lora = AIModel(
